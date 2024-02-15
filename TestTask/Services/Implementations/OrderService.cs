@@ -1,18 +1,34 @@
-﻿using TestTask.Models;
+﻿using System.Net.Mime;
+using Microsoft.EntityFrameworkCore;
+using TestTask.Data;
+using TestTask.Models;
 using TestTask.Services.Interfaces;
 
 namespace TestTask.Services.Implementations
 {
     public class OrderService : IOrderService
     {
-        public Task<Order> GetOrder()
+        private readonly ApplicationDbContext _dbContext;
+
+        public OrderService(ApplicationDbContext dbContext)
         {
-            throw new NotImplementedException();
+            _dbContext = dbContext;
+        }
+        public async Task<Order> GetOrder()
+        {
+            var order = await _dbContext.Orders
+                .OrderByDescending(order => order.Price * order.Quantity)
+                .FirstOrDefaultAsync();
+            if (order == null) throw new ArgumentNullException(nameof(order));
+            return order;
         }
 
-        public Task<List<Order>> GetOrders()
+        public async Task<List<Order>> GetOrders()
         {
-            throw new NotImplementedException();
+            var orders = await _dbContext.Orders
+                .Where(order => order.Quantity > 10)
+                .ToListAsync();
+            return orders;
         }
     }
 }
