@@ -1,5 +1,4 @@
-﻿using System.Net.Mime;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TestTask.Data;
 using TestTask.Models;
 using TestTask.Services.Interfaces;
