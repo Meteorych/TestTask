@@ -1,18 +1,39 @@
-﻿using TestTask.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using TestTask.Data;
+using TestTask.Enums;
+using TestTask.Models;
 using TestTask.Services.Interfaces;
 
 namespace TestTask.Services.Implementations
 {
     public class UserService : IUserService
     {
-        public Task<User> GetUser()
+        private readonly ApplicationDbContext _dbContext;
+
+        public UserService(ApplicationDbContext dbContext)
         {
-            throw new NotImplementedException();
+            _dbContext = dbContext;
         }
 
-        public Task<List<User>> GetUsers()
+        public async Task<User> GetUser()
         {
-            throw new NotImplementedException();
+            var userId = await _dbContext.Orders
+                .GroupBy(order => order.UserId)
+                .OrderByDescending(group => group.Count())
+                .Select(group => group.Key)
+                .FirstOrDefaultAsync();
+            var user = await _dbContext.Users
+               .FirstOrDefaultAsync(user => user.Id == userId);
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            return user;
+        }
+
+        public async Task<List<User>> GetUsers()
+        {
+            var users = await _dbContext.Users
+                .Where(user => user.Status == UserStatus.Active)
+                .ToListAsync();
+            return users;
         }
     }
 }
