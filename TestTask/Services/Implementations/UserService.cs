@@ -31,7 +31,7 @@ namespace TestTask.Services.Implementations
         public async Task<List<User>> GetUsers()
         {
             var users = await _dbContext.Users
-                .Where(user => user.Status == UserStatus.Active)
+                .Where(user => user.Status == UserStatus.Inactive)
                 .ToListAsync();
             return users;
         }
